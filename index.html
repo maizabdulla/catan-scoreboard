@@ -342,25 +342,55 @@
             }
         }
 
+                // 7. Pull Data & Compute Global Leaderboards (Fixed to find the absolute winner)
         async function renderLeaderboards() {
-            const { data: scores, error: scoresErr } = await db.from('match_scores').select('player_id, points_scored');
-            const { data: matches, error: matchesErr } = await db.from('matches').select('longest_road_player_id');
+            // Fetch all individual player scores and all match metadata
+            const { data: scores, error: scoresErr } = await db.from('match_scores').select('match_id, player_id, points_scored');
+            const { data: matches, error: matchesErr } = await db.from('matches').select('id, longest_road_player_id');
             if (scoresErr || matchesErr) return;
 
+            // Initialize our stats tracking tracking object for players
             const stats = {};
             globalPlayers.forEach(p => {
                 stats[p.id] = { name: p.name, wins: 0, totalPoints: 0, longestRoads: 0 };
             });
 
+            // Step A: Group individual point records by match_id to evaluate matches independently
+            const scoresByMatch = {};
             scores.forEach(s => {
                 if (stats[s.player_id]) {
+                    // Accumulate career total points safely
                     stats[s.player_id].totalPoints += s.points_scored;
-                    if (s.points_scored >= 10) {
-                        stats[s.player_id].wins += 1;
+                }
+                
+                if (!scoresByMatch[s.match_id]) {
+                    scoresByMatch[s.match_id] = [];
+                }
+                scoresByMatch[s.match_id].push(s);
+            });
+
+            // Step B: Evaluate each game match to find the single true winner
+            Object.keys(scoresByMatch).forEach(matchId => {
+                const matchPlayers = scoresByMatch[matchId];
+                
+                let highestScore = -1;
+                let winnerPlayerId = null;
+
+                matchPlayers.forEach(pRecord => {
+                    // Catan standard requires at least 10 points to win, and it must be the highest score
+                    if (pRecord.points_scored >= 10 && pRecord.points_scored > highestScore) {
+                        highestScore = pRecord.points_scored;
+                        winnerPlayerId = pRecord.player_id;
                     }
+                });
+
+                // Award exactly ONE win to the highest scorer of this match
+                if (winnerPlayerId && stats[winnerPlayerId]) {
+                    stats[winnerPlayerId].wins += 1;
                 }
             });
 
+            // Step C: Calculate career Longest Road counts
             matches.forEach(m => {
                 if (m.longest_road_player_id && stats[m.longest_road_player_id]) {
                     stats[m.longest_road_player_id].longestRoads += 1;
@@ -369,6 +399,7 @@
 
             const statsArray = Object.values(stats);
 
+            // Render Wins Leaderboard
             const winsSorted = [...statsArray].sort((a, b) => b.wins - a.wins);
             const winsBody = document.getElementById('winsLeaderboardBody');
             if (winsBody) {
@@ -384,6 +415,7 @@
                 });
             }
 
+            // Render Points & Road Leaderboard
             const pointsSorted = [...statsArray].sort((a, b) => b.totalPoints - a.totalPoints);
             const pointsBody = document.getElementById('pointsLeaderboardBody');
             if (pointsBody) {
