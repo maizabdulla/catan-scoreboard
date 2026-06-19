@@ -12,7 +12,7 @@
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-xl md:text-2xl font-bold tracking-tight text-amber-500 flex items-center gap-2">
-                🎲 Catan Scoreboard
+                🎲 Catan Group Scoreboard
             </h1>
             <div class="flex gap-2">
                 <button id="adminBtn" onclick="toggleAdminPanelVisibility()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-700 transition duration-200 cursor-pointer shadow-sm">
@@ -51,18 +51,33 @@
                     🛠️ Admin Control Dashboard
                 </h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800">
                         <h3 class="font-semibold text-slate-200 mb-3 text-sm tracking-wide uppercase text-amber-500/80">Manage Players</h3>
-                        <div class="flex gap-2 mb-4">
-                            <input type="text" id="newPlayerName" placeholder="Player Name" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
-                            <button onclick="addPlayer()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded-lg text-sm transition cursor-pointer">Add</button>
+                        <div class="space-y-3 mb-4 border-b border-slate-800 pb-4">
+                            <input type="text" id="newPlayerName" placeholder="Name (e.g. Maiz)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
+                            
+                            <div class="flex gap-2">
+                                <div class="w-1/2">
+                                    <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Emoji Profile</label>
+                                    <input type="text" id="newPlayerEmoji" placeholder="🦊" value="🎲" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm w-full text-center focus:outline-none focus:border-amber-500 text-slate-100">
+                                </div>
+                                <div class="w-1/2">
+                                    <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Theme Color</label>
+                                    <div class="flex gap-1 items-center bg-slate-900 border border-slate-700 rounded-lg px-2 py-1">
+                                        <input type="color" id="newPlayerColor" value="#f59e0b" class="bg-transparent border-0 w-8 h-7 p-0 cursor-pointer">
+                                        <span class="text-xs font-mono text-slate-400">Pick</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="addPlayer()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-1.5 rounded-lg text-sm transition cursor-pointer">Add Player Custom Avatar</button>
                         </div>
                         <div id="adminPlayersList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
                             </div>
                     </div>
 
-                    <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800 md:col-span-2">
+                    <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800 lg:col-span-2">
                         <h3 class="font-semibold text-slate-200 mb-3 text-sm tracking-wide uppercase text-amber-500/80">Log a New Match</h3>
                         <div id="matchFormPlayers" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                             </div>
@@ -101,17 +116,22 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
-                <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
-                    🏆 Most Wins Leaderboard
-                </h2>
-                <div class="overflow-x-auto">
+            
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden">
+                <div class="p-5 border-b border-slate-800/80 bg-slate-900/20 flex justify-between items-center">
+                    <h2 class="text-base font-bold text-slate-200 tracking-tight flex items-center gap-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm">🏆</span>
+                        Most Wins Leaderboard
+                    </h2>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">10+ PTS TO WIN</span>
+                </div>
+                <div class="p-2">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-xs font-semibold text-slate-400 border-b border-slate-800">
-                                <th class="pb-2 w-16">Rank</th>
-                                <th class="pb-2">Player</th>
-                                <th class="pb-2 text-right">Wins (10+ Pts)</th>
+                            <tr class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800/60">
+                                <th class="p-4 w-16 text-center">Rank</th>
+                                <th class="p-4">Player</th>
+                                <th class="p-4 text-right">Victories</th>
                             </tr>
                         </thead>
                         <tbody id="winsLeaderboardBody" class="divide-y divide-slate-800/40">
@@ -120,17 +140,20 @@
                 </div>
             </div>
 
-            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
-                <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
-                    📊 Total Points & Longest Road
-                </h2>
-                <div class="overflow-x-auto">
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden">
+                <div class="p-5 border-b border-slate-800/80 bg-slate-900/20">
+                    <h2 class="text-base font-bold text-slate-200 tracking-tight flex items-center gap-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 text-sm">📊</span>
+                        Cumulative Statistics
+                    </h2>
+                </div>
+                <div class="p-2">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-xs font-semibold text-slate-400 border-b border-slate-800">
-                                <th class="pb-2">Player</th>
-                                <th class="pb-2 text-right">Total Points</th>
-                                <th class="pb-2 text-right w-36">Longest Road Count</th>
+                            <tr class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800/60">
+                                <th class="p-4">Player</th>
+                                <th class="p-4 text-right">Total Points</th>
+                                <th class="p-4 text-right w-36">Longest Road</th>
                             </tr>
                         </thead>
                         <tbody id="pointsLeaderboardBody" class="divide-y divide-slate-800/40">
@@ -138,6 +161,7 @@
                     </table>
                 </div>
             </div>
+
         </div>
     </main>
 
@@ -149,23 +173,19 @@
         let globalPlayers = [];
         let IsAdminAuthenticated = false;
 
-        // Toggle visibility of the main admin container block
         function toggleAdminPanelVisibility() {
             const container = document.getElementById('adminContainer');
             container.classList.toggle('hidden');
             updateAdminUIViewState();
         }
 
-        // Evaluate credentials entered into the inputs
         function handleLogin() {
             const userField = document.getElementById('adminUsername').value.trim();
             const passField = document.getElementById('adminPassword').value;
 
-            // Change "admin" or "settlers10" below to your preferred account values!
             if (userField === "admin" && passField === "settlers10") {
                 IsAdminAuthenticated = true;
                 updateAdminUIViewState();
-                // Clear fields for security
                 document.getElementById('adminUsername').value = '';
                 document.getElementById('adminPassword').value = '';
             } else {
@@ -173,14 +193,12 @@
             }
         }
 
-        // Erase login token privileges
         function handleLogout() {
             IsAdminAuthenticated = false;
             updateAdminUIViewState();
             document.getElementById('adminContainer').classList.add('hidden');
         }
 
-        // Controls what elements are visible depending on login state
         function updateAdminUIViewState() {
             const loginBlock = document.getElementById('loginFormBlock');
             const dashboardBlock = document.getElementById('adminDashboardBlock');
@@ -222,10 +240,14 @@
             adminPlayersList.innerHTML = '';
 
             data.forEach(player => {
+                const pEmoji = player.avatar_emoji || '🎲';
+                const pColor = player.avatar_color || '#f59e0b';
+
                 formContainer.innerHTML += `
                     <div class="flex items-center justify-between bg-slate-900/80 p-2 rounded-lg border border-slate-800">
                         <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer select-none">
                             <input type="checkbox" data-id="${player.id}" class="match-player-check rounded text-amber-500 focus:ring-0 bg-slate-800 border-slate-700">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-md text-xs" style="background-color: ${pColor}20; color: ${pColor}; border: 1px solid ${pColor}40">${pEmoji}</span>
                             ${player.name}
                         </label>
                         <input type="number" data-id="${player.id}" min="0" max="15" placeholder="0" class="match-player-score bg-slate-950 border border-slate-700 rounded px-2 py-1 w-16 text-center text-sm focus:outline-none focus:border-amber-500 text-slate-100">
@@ -234,7 +256,10 @@
                 roadSelect.innerHTML += `<option value="${player.id}">${player.name}</option>`;
                 adminPlayersList.innerHTML += `
                     <div class="flex items-center justify-between bg-slate-900/40 px-3 py-1.5 rounded-md border border-slate-800/60 text-sm text-slate-300">
-                        <span>${player.name}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded" style="background-color: ${pColor}20; color: ${pColor}">${pEmoji}</span>
+                            <span>${player.name}</span>
+                        </div>
                         <button onclick="deletePlayer('${player.id}', '${player.name}')" class="text-xs text-rose-400 hover:text-rose-600 transition cursor-pointer font-medium font-mono px-1">✕ Delete</button>
                     </div>
                 `;
@@ -275,14 +300,22 @@
 
         async function addPlayer() {
             const nameInput = document.getElementById('newPlayerName');
+            const emojiInput = document.getElementById('newPlayerEmoji');
+            const colorInput = document.getElementById('newPlayerColor');
+
             const name = nameInput.value.trim();
+            const avatar_emoji = emojiInput.value.trim() || '🎲';
+            const avatar_color = colorInput.value;
+
             if (!name) return alert('Please enter a name.');
 
-            const { error } = await db.from('players').insert([{ name }]);
+            const { error } = await db.from('players').insert([{ name, avatar_emoji, avatar_color }]);
             if (error) {
                 alert('Error adding player or player already exists.');
             } else {
                 nameInput.value = '';
+                emojiInput.value = '🎲';
+                colorInput.value = '#f59e0b';
                 await loadDashboard();
             }
         }
@@ -342,55 +375,44 @@
             }
         }
 
-                // 7. Pull Data & Compute Global Leaderboards (Fixed to find the absolute winner)
         async function renderLeaderboards() {
-            // Fetch all individual player scores and all match metadata
             const { data: scores, error: scoresErr } = await db.from('match_scores').select('match_id, player_id, points_scored');
             const { data: matches, error: matchesErr } = await db.from('matches').select('id, longest_road_player_id');
             if (scoresErr || matchesErr) return;
 
-            // Initialize our stats tracking tracking object for players
             const stats = {};
             globalPlayers.forEach(p => {
-                stats[p.id] = { name: p.name, wins: 0, totalPoints: 0, longestRoads: 0 };
+                stats[p.id] = { name: p.name, emoji: p.avatar_emoji || '🎲', color: p.avatar_color || '#f59e0b', wins: 0, totalPoints: 0, longestRoads: 0 };
             });
 
-            // Step A: Group individual point records by match_id to evaluate matches independently
             const scoresByMatch = {};
             scores.forEach(s => {
                 if (stats[s.player_id]) {
-                    // Accumulate career total points safely
                     stats[s.player_id].totalPoints += s.points_scored;
                 }
-                
                 if (!scoresByMatch[s.match_id]) {
                     scoresByMatch[s.match_id] = [];
                 }
                 scoresByMatch[s.match_id].push(s);
             });
 
-            // Step B: Evaluate each game match to find the single true winner
             Object.keys(scoresByMatch).forEach(matchId => {
                 const matchPlayers = scoresByMatch[matchId];
-                
                 let highestScore = -1;
                 let winnerPlayerId = null;
 
                 matchPlayers.forEach(pRecord => {
-                    // Catan standard requires at least 10 points to win, and it must be the highest score
                     if (pRecord.points_scored >= 10 && pRecord.points_scored > highestScore) {
                         highestScore = pRecord.points_scored;
                         winnerPlayerId = pRecord.player_id;
                     }
                 });
 
-                // Award exactly ONE win to the highest scorer of this match
                 if (winnerPlayerId && stats[winnerPlayerId]) {
                     stats[winnerPlayerId].wins += 1;
                 }
             });
 
-            // Step C: Calculate career Longest Road counts
             matches.forEach(m => {
                 if (m.longest_road_player_id && stats[m.longest_road_player_id]) {
                     stats[m.longest_road_player_id].longestRoads += 1;
@@ -399,33 +421,55 @@
 
             const statsArray = Object.values(stats);
 
-            // Render Wins Leaderboard
+            // Render Wins Leaderboard Rows
             const winsSorted = [...statsArray].sort((a, b) => b.wins - a.wins);
             const winsBody = document.getElementById('winsLeaderboardBody');
             if (winsBody) {
                 winsBody.innerHTML = '';
                 winsSorted.forEach((p, index) => {
+                    let rankBadge = `<span class="font-mono text-slate-500 font-bold">#${index + 1}</span>`;
+                    if (index === 0 && p.wins > 0) rankBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30">🥇</span>`;
+                    if (index === 1 && p.wins > 0) rankBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-400/20 text-slate-300 text-xs font-bold border border-slate-400/30">🥈</span>`;
+                    
                     winsBody.innerHTML += `
-                        <tr class="text-sm">
-                            <td class="py-3 font-bold text-slate-500">#${index + 1}</td>
-                            <td class="py-3 font-semibold text-slate-200">${p.name}</td>
-                            <td class="py-3 text-right font-bold text-emerald-400">${p.wins}</td>
+                        <tr class="group hover:bg-slate-900/30 transition duration-150">
+                            <td class="p-4 text-center font-medium">${rankBadge}</td>
+                            <td class="p-4 font-semibold text-slate-200 group-hover:text-amber-400 transition flex items-center gap-3">
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl text-sm" style="background-color: ${p.color}15; color: ${p.color}; border: 1px solid ${p.color}30">
+                                    ${p.emoji}
+                                </span>
+                                ${p.name}
+                            </td>
+                            <td class="p-4 text-right">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold font-mono ${p.wins > 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800/40 text-slate-500'}" style="${p.wins > 0 ? `background-color: ${p.color}10; color: ${p.color}; border-color: ${p.color}30;` : ''}">
+                                    ${p.wins} ${p.wins === 1 ? 'Win' : 'Wins'}
+                                </span>
+                            </td>
                         </tr>
                     `;
                 });
             }
 
-            // Render Points & Road Leaderboard
+            // Render Points & Road Leaderboard Rows
             const pointsSorted = [...statsArray].sort((a, b) => b.totalPoints - a.totalPoints);
             const pointsBody = document.getElementById('pointsLeaderboardBody');
             if (pointsBody) {
                 pointsBody.innerHTML = '';
                 pointsSorted.forEach(p => {
                     pointsBody.innerHTML += `
-                        <tr class="text-sm">
-                            <td class="py-3 font-semibold text-slate-200">${p.name}</td>
-                            <td class="py-3 text-right font-bold text-amber-400">${p.totalPoints} pts</td>
-                            <td class="py-3 text-right font-bold text-blue-400">🪵 ${p.longestRoads}</td>
+                        <tr class="group hover:bg-slate-900/30 transition duration-150">
+                            <td class="p-4 font-semibold text-slate-200 group-hover:text-amber-400 transition flex items-center gap-3">
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl text-sm" style="background-color: ${p.color}15; color: ${p.color}; border: 1px solid ${p.color}30">
+                                    ${p.emoji}
+                                </span>
+                                ${p.name}
+                            </td>
+                            <td class="p-4 text-right font-bold text-amber-500/90 font-mono text-sm">${p.totalPoints} <span class="text-xs text-slate-500 font-normal">pts</span></td>
+                            <td class="p-4 text-right">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold font-mono ${p.longestRoads > 0 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-slate-800/40 text-slate-500'}">
+                                    🪵 ${p.longestRoads}
+                                </span>
+                            </td>
                         </tr>
                     `;
                 });
@@ -436,4 +480,3 @@
     </script>
 </body>
 </html>
-        
