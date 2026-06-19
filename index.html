@@ -3,145 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catan Scoreboard</title>
+    <title>Catan Group Scoreboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
 
-    <div class="max-w-4xl mx-auto">
-        <header class="flex justify-between items-center border-b border-slate-700 pb-4 mb-8">
-            <h1 class="text-3xl font-bold text-amber-500">🎲 Catan Group Scoreboard</h1>
-            <button id="adminBtn" onclick="toggleAdminView()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded text-sm font-semibold transition">
-                Admin Mode
-            </button>
-        </header>
-
-        <div id="adminPanel" class="hidden bg-slate-800 border border-amber-600/30 p-6 rounded-xl mb-8 shadow-xl">
-            <h2 class="text-xl font-bold mb-4 text-amber-400">🛠️ Admin Controls</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <h3 class="font-semibold mb-2 text-sm uppercase tracking-wider text-slate-400">Add New Player</h3>
-                    <div class="flex gap-2">
-                        <input type="text" id="newPlayerName" placeholder="Player name..." class="bg-slate-900 border border-slate-700 rounded px-3 py-2 w-full focus:outline-none focus:border-amber-500">
-                        <button onclick="addPlayer()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded transition">Add</button>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="font-semibold mb-2 text-sm uppercase tracking-wider text-slate-400">Log a Match</h3>
-                    <div id="matchFormPlayers" class="space-y-2 mb-4">
-                        <p class="text-slate-500 text-sm">Add players to the group first.</p>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Longest Road Holder</label>
-                        <select id="longestRoadSelect" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 w-full focus:outline-none focus:border-amber-500">
-                            <option value="">Nobody / Tie</option>
-                        </select>
-                    </div>
-                    <button onclick="submitMatch()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded transition">Submit Match Results</button>
-                </div>
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight text-amber-500 flex items-center gap-2">
+                🎲 Catan Group Scoreboard
+            </h1>
+            <div class="flex gap-2">
+                <button id="adminBtn" onclick="toggleAdminPanelVisibility()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-700 transition duration-200 cursor-pointer shadow-sm">
+                    Admin Panel
+                </button>
+                <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-950/40 hover:bg-rose-900 text-rose-400 text-sm font-semibold px-4 py-2 rounded-lg border border-rose-900/50 transition duration-200 cursor-pointer shadow-sm">
+                    Log Out
+                </button>
             </div>
         </div>
+    </header>
 
-        <main class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        
+        <div id="adminContainer" class="hidden mb-10 p-6 bg-slate-900 rounded-xl border border-amber-500/30 shadow-xl shadow-amber-500/5 transition-all">
             
-            <div class="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-emerald-400">
+            <div id="loginFormBlock" class="max-w-sm mx-auto py-4">
+                <h2 class="text-lg font-bold text-amber-400 mb-4 text-center">🔐 Admin Authentication</h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Username</label>
+                        <input type="text" id="adminUsername" placeholder="admin" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Password</label>
+                        <input type="password" id="adminPassword" placeholder="••••••••" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
+                    </div>
+                    <button onclick="handleLogin()" class="w-full mt-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded-lg text-sm transition cursor-pointer">
+                        Sign In
+                    </button>
+                </div>
+            </div>
+
+            <div id="adminDashboardBlock" class="hidden">
+                <h2 class="text-lg font-bold text-amber-400 mb-6 flex items-center gap-2 border-b border-slate-800 pb-2">
+                    🛠️ Admin Control Dashboard
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800">
+                        <h3 class="font-semibold text-slate-200 mb-3 text-sm tracking-wide uppercase text-amber-500/80">Manage Players</h3>
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="newPlayerName" placeholder="Player Name" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
+                            <button onclick="addPlayer()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded-lg text-sm transition cursor-pointer">Add</button>
+                        </div>
+                        <div id="adminPlayersList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                            </div>
+                    </div>
+
+                    <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800 md:col-span-2">
+                        <h3 class="font-semibold text-slate-200 mb-3 text-sm tracking-wide uppercase text-amber-500/80">Log a New Match</h3>
+                        <div id="matchFormPlayers" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                            </div>
+                        
+                        <div class="border-t border-slate-800 pt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+                            <div class="w-full sm:w-auto">
+                                <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Longest Road</label>
+                                <select id="longestRoadSelect" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 w-full sm:w-48 focus:outline-none focus:border-amber-500">
+                                    </select>
+                            </div>
+                            <button onclick="submitMatch()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-6 py-2 rounded-lg text-sm shadow-md transition cursor-pointer self-end">
+                                Submit Match Results 🎲
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 border-t border-slate-800 pt-4">
+                    <h3 class="font-semibold text-slate-200 mb-3 text-sm tracking-wide uppercase text-amber-500/80">Recent Matches History</h3>
+                    <div class="overflow-x-auto bg-slate-950/40 rounded-lg border border-slate-800 max-h-48 overflow-y-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs font-semibold text-slate-400 border-b border-slate-800 bg-slate-900/50">
+                                    <th class="p-3">Match ID</th>
+                                    <th class="p-3">Longest Road Holder</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminMatchesList">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
+                <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
                     🏆 Most Wins Leaderboard
                 </h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-slate-700 text-slate-400 text-sm">
-                                <th class="pb-2">Rank</th>
+                            <tr class="text-xs font-semibold text-slate-400 border-b border-slate-800">
+                                <th class="pb-2 w-16">Rank</th>
                                 <th class="pb-2">Player</th>
                                 <th class="pb-2 text-right">Wins (10+ Pts)</th>
                             </tr>
                         </thead>
-                        <tbody id="winsLeaderboardBody" class="divide-y divide-slate-700/50">
+                        <tbody id="winsLeaderboardBody" class="divide-y divide-slate-800/40">
                             </tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-amber-400">
+            <div class="bg-slate-900/60 border border-slate-800/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
+                <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
                     📊 Total Points & Longest Road
                 </h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-slate-700 text-slate-400 text-sm">
+                            <tr class="text-xs font-semibold text-slate-400 border-b border-slate-800">
                                 <th class="pb-2">Player</th>
                                 <th class="pb-2 text-right">Total Points</th>
-                                <th class="pb-2 text-right">Longest Road Count</th>
+                                <th class="pb-2 text-right w-36">Longest Road Count</th>
                             </tr>
                         </thead>
-                        <tbody id="pointsLeaderboardBody" class="divide-y divide-slate-700/50">
+                        <tbody id="pointsLeaderboardBody" class="divide-y divide-slate-800/40">
                             </tbody>
                     </table>
                 </div>
             </div>
-
-        </main>
-    </div>
+        </div>
+    </main>
 
     <script>
-    
-        // ======= SUPABASE CONFIGURATION =======
         const SUPABASE_URL = "https://zbnqetjsyhibbdquecgm.supabase.co"; 
         const SUPABASE_ANON_KEY = "sb_publishable_auN7hvLZKVZtVWXTglsb9A_RHO7Ic_L";
-        
-        // Fixed the naming conflict here:
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let globalPlayers = [];
+        let IsAdminAuthenticated = false;
 
-        // Toggle admin panel visibility
-        function toggleAdminView() {
-            const panel = document.getElementById('adminPanel');
-            panel.classList.toggle('hidden');
+        // Toggle visibility of the main admin container block
+        function toggleAdminPanelVisibility() {
+            const container = document.getElementById('adminContainer');
+            container.classList.toggle('hidden');
+            updateAdminUIViewState();
         }
 
-        // Fetch everything on page load
+        // Evaluate credentials entered into the inputs
+        function handleLogin() {
+            const userField = document.getElementById('adminUsername').value.trim();
+            const passField = document.getElementById('adminPassword').value;
+
+            // Change "admin" or "settlers10" below to your preferred account values!
+            if (userField === "admin" && passField === "settlers10") {
+                IsAdminAuthenticated = true;
+                updateAdminUIViewState();
+                // Clear fields for security
+                document.getElementById('adminUsername').value = '';
+                document.getElementById('adminPassword').value = '';
+            } else {
+                alert("Invalid admin user identity or password.");
+            }
+        }
+
+        // Erase login token privileges
+        function handleLogout() {
+            IsAdminAuthenticated = false;
+            updateAdminUIViewState();
+            document.getElementById('adminContainer').classList.add('hidden');
+        }
+
+        // Controls what elements are visible depending on login state
+        function updateAdminUIViewState() {
+            const loginBlock = document.getElementById('loginFormBlock');
+            const dashboardBlock = document.getElementById('adminDashboardBlock');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const adminToggleBtn = document.getElementById('adminBtn');
+
+            if (IsAdminAuthenticated) {
+                loginBlock.classList.add('hidden');
+                dashboardBlock.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+                adminToggleBtn.innerText = "Close Panel";
+            } else {
+                loginBlock.classList.remove('hidden');
+                dashboardBlock.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
+                adminToggleBtn.innerText = "Admin Panel";
+            }
+        }
+
         async function loadDashboard() {
             await fetchPlayers();
+            await fetchRecentMatches();
             await renderLeaderboards();
         }
 
-        // 1. Fetch Players from DB
         async function fetchPlayers() {
             const { data, error } = await db.from('players').select('*').order('name', { ascending: true });
             if (error) return console.error(error);
-            
             globalPlayers = data;
             
-            // Render inside Admin Log Match fields
             const formContainer = document.getElementById('matchFormPlayers');
             const roadSelect = document.getElementById('longestRoadSelect');
+            const adminPlayersList = document.getElementById('adminPlayersList');
             
-            if (!formContainer || !roadSelect) return;
+            if (!formContainer || !roadSelect || !adminPlayersList) return;
 
-            formContainer.innerHTML = '<h4 class="text-xs text-slate-400 uppercase font-semibold mb-1">Enter Match Scores</h4>';
+            formContainer.innerHTML = '';
             roadSelect.innerHTML = '<option value="">Nobody / Tie</option>';
+            adminPlayersList.innerHTML = '';
 
             data.forEach(player => {
                 formContainer.innerHTML += `
-                    <div class="flex items-center justify-between bg-slate-900/50 p-2 rounded border border-slate-700/50">
-                        <label class="flex items-center gap-2 text-sm">
-                            <input type="checkbox" data-id="${player.id}" class="match-player-check rounded text-amber-500 focus:ring-0 bg-slate-800 border-slate-600">
+                    <div class="flex items-center justify-between bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer select-none">
+                            <input type="checkbox" data-id="${player.id}" class="match-player-check rounded text-amber-500 focus:ring-0 bg-slate-800 border-slate-700">
                             ${player.name}
                         </label>
-                        <input type="number" data-id="${player.id}" min="0" max="15" placeholder="0" class="match-player-score bg-slate-900 border border-slate-700 rounded px-2 py-1 w-16 text-center text-sm focus:outline-none focus:border-amber-500">
+                        <input type="number" data-id="${player.id}" min="0" max="15" placeholder="0" class="match-player-score bg-slate-950 border border-slate-700 rounded px-2 py-1 w-16 text-center text-sm focus:outline-none focus:border-amber-500 text-slate-100">
                     </div>
                 `;
                 roadSelect.innerHTML += `<option value="${player.id}">${player.name}</option>`;
+                adminPlayersList.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-900/40 px-3 py-1.5 rounded-md border border-slate-800/60 text-sm text-slate-300">
+                        <span>${player.name}</span>
+                        <button onclick="deletePlayer('${player.id}', '${player.name}')" class="text-xs text-rose-400 hover:text-rose-600 transition cursor-pointer font-medium font-mono px-1">✕ Delete</button>
+                    </div>
+                `;
             });
         }
 
-        // 2. Add New Player
+        async function fetchRecentMatches() {
+            const adminMatchesList = document.getElementById('adminMatchesList');
+            if (!adminMatchesList) return;
+
+            const { data: matches, error } = await db.from('matches').select('id, longest_road_player_id, created_at').order('created_at', { ascending: false }).limit(20);
+            if (error) return console.error(error);
+
+            adminMatchesList.innerHTML = '';
+            if (matches.length === 0) {
+                adminMatchesList.innerHTML = `<tr><td colspan="3" class="p-3 text-sm text-slate-500 text-center">No matches recorded yet.</td></tr>`;
+                return;
+            }
+
+            matches.forEach(m => {
+                const roadHolder = globalPlayers.find(p => p.id == m.longest_road_player_id);
+                const roadName = roadHolder ? roadHolder.name : "None / Tie";
+                const shortId = m.id.substring(0, 8);
+                
+                adminMatchesList.innerHTML += `
+                    <tr class="text-sm border-b border-slate-800/40 hover:bg-slate-900/20">
+                        <td class="p-3 text-slate-400 font-mono text-xs">ID: ${shortId}...</td>
+                        <td class="p-3 text-slate-200">${roadName}</td>
+                        <td class="p-3 text-right">
+                            <button onclick="deleteMatch('${m.id}')" class="text-xs bg-rose-950/40 hover:bg-rose-900 text-rose-400 px-2.5 py-1 rounded border border-rose-900/50 transition cursor-pointer">
+                                Delete Match
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
         async function addPlayer() {
             const nameInput = document.getElementById('newPlayerName');
             const name = nameInput.value.trim();
@@ -156,23 +287,36 @@
             }
         }
 
-        // 3. Submit Match Results
+        async function deletePlayer(id, name) {
+            if (!confirm(`Are you sure you want to delete "${name}"? This deletes all associated match history for them.`)) return;
+            const { error } = await db.from('players').delete().eq('id', id);
+            if (error) {
+                alert('Failed to delete player: ' + error.message);
+            } else {
+                await loadDashboard();
+            }
+        }
+
+        async function deleteMatch(matchId) {
+            if (!confirm("Are you sure you want to delete this match record? All player points gained from this match will be lost permanently.")) return;
+            const { error } = await db.from('matches').delete().eq('id', matchId);
+            if (error) {
+                alert('Failed to drop match: ' + error.message);
+            } else {
+                await loadDashboard();
+            }
+        }
+
         async function submitMatch() {
             const checkedBoxes = document.querySelectorAll('.match-player-check:checked');
             const longestRoadPlayerId = document.getElementById('longestRoadSelect').value || null;
 
             if (checkedBoxes.length < 2) return alert('A match must have at least 2 players.');
 
-            // A: Insert into Matches Table
-            const { data: matchData, error: matchError } = await db
-                .from('matches')
-                .insert([{ longest_road_player_id: longestRoadPlayerId }])
-                .select();
-
+            const { data: matchData, error: matchError } = await db.from('matches').insert([{ longest_road_player_id: longestRoadPlayerId }]).select();
             if (matchError) return alert('Failed to create match record.');
             const matchId = matchData[0].id;
 
-            // B: Prepare scores array
             const scoreRecords = [];
             checkedBoxes.forEach(cb => {
                 const playerId = cb.getAttribute('data-id');
@@ -186,7 +330,6 @@
                 });
             });
 
-            // C: Bulk insert match scores
             const { error: scoreError } = await db.from('match_scores').insert(scoreRecords);
             if (scoreError) {
                 alert('Error recording match scores.');
@@ -199,11 +342,9 @@
             }
         }
 
-        // 4. Pull Stats & Build Leaderboards
         async function renderLeaderboards() {
             const { data: scores, error: scoresErr } = await db.from('match_scores').select('player_id, points_scored');
             const { data: matches, error: matchesErr } = await db.from('matches').select('longest_road_player_id');
-            
             if (scoresErr || matchesErr) return;
 
             const stats = {};
@@ -228,7 +369,6 @@
 
             const statsArray = Object.values(stats);
 
-            // Render Wins Leaderboard
             const winsSorted = [...statsArray].sort((a, b) => b.wins - a.wins);
             const winsBody = document.getElementById('winsLeaderboardBody');
             if (winsBody) {
@@ -236,7 +376,7 @@
                 winsSorted.forEach((p, index) => {
                     winsBody.innerHTML += `
                         <tr class="text-sm">
-                            <td class="py-3 font-bold text-slate-400">#${index + 1}</td>
+                            <td class="py-3 font-bold text-slate-500">#${index + 1}</td>
                             <td class="py-3 font-semibold text-slate-200">${p.name}</td>
                             <td class="py-3 text-right font-bold text-emerald-400">${p.wins}</td>
                         </tr>
@@ -244,7 +384,6 @@
                 });
             }
 
-            // Render Points & Road Leaderboard
             const pointsSorted = [...statsArray].sort((a, b) => b.totalPoints - a.totalPoints);
             const pointsBody = document.getElementById('pointsLeaderboardBody');
             if (pointsBody) {
@@ -261,9 +400,10 @@
             }
         }
 
-        // Initialize dashboard
         loadDashboard();
     </script>
+</body>
+</html>
          
          git remote add origin https://github.com/maizabdulla/catan-scoreboard.git
 git branch -M main
