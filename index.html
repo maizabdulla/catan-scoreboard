@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catan Scoreboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center border-b border-slate-700 pb-4 mb-8">
+            <h1 class="text-3xl font-bold text-amber-500">🎲 Catan Group Scoreboard</h1>
+            <button id="adminBtn" onclick="toggleAdminView()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded text-sm font-semibold transition">
+                Admin Mode
+            </button>
+        </header>
+
+        <div id="adminPanel" class="hidden bg-slate-800 border border-amber-600/30 p-6 rounded-xl mb-8 shadow-xl">
+            <h2 class="text-xl font-bold mb-4 text-amber-400">🛠️ Admin Controls</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-semibold mb-2 text-sm uppercase tracking-wider text-slate-400">Add New Player</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="newPlayerName" placeholder="Player name..." class="bg-slate-900 border border-slate-700 rounded px-3 py-2 w-full focus:outline-none focus:border-amber-500">
+                        <button onclick="addPlayer()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded transition">Add</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-2 text-sm uppercase tracking-wider text-slate-400">Log a Match</h3>
+                    <div id="matchFormPlayers" class="space-y-2 mb-4">
+                        <p class="text-slate-500 text-sm">Add players to the group first.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Longest Road Holder</label>
+                        <select id="longestRoadSelect" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 w-full focus:outline-none focus:border-amber-500">
+                            <option value="">Nobody / Tie</option>
+                        </select>
+                    </div>
+                    <button onclick="submitMatch()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded transition">Submit Match Results</button>
+                </div>
+            </div>
+        </div>
+
+        <main class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-emerald-400">
+                    🏆 Most Wins Leaderboard
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-700 text-slate-400 text-sm">
+                                <th class="pb-2">Rank</th>
+                                <th class="pb-2">Player</th>
+                                <th class="pb-2 text-right">Wins (10+ Pts)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="winsLeaderboardBody" class="divide-y divide-slate-700/50">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-amber-400">
+                    📊 Total Points & Longest Road
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-700 text-slate-400 text-sm">
+                                <th class="pb-2">Player</th>
+                                <th class="pb-2 text-right">Total Points</th>
+                                <th class="pb-2 text-right">Longest Road Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pointsLeaderboardBody" class="divide-y divide-slate-700/50">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+    
+        // ======= SUPABASE CONFIGURATION =======
+        const SUPABASE_URL = "https://zbnqetjsyhibbdquecgm.supabase.co"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_auN7hvLZKVZtVWXTglsb9A_RHO7Ic_L";
+        
+        // Fixed the naming conflict here:
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let globalPlayers = [];
+
+        // Toggle admin panel visibility
+        function toggleAdminView() {
+            const panel = document.getElementById('adminPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        // Fetch everything on page load
+        async function loadDashboard() {
+            await fetchPlayers();
+            await renderLeaderboards();
+        }
+
+        // 1. Fetch Players from DB
+        async function fetchPlayers() {
+            const { data, error } = await db.from('players').select('*').order('name', { ascending: true });
+            if (error) return console.error(error);
+            
+            globalPlayers = data;
+            
+            // Render inside Admin Log Match fields
+            const formContainer = document.getElementById('matchFormPlayers');
+            const roadSelect = document.getElementById('longestRoadSelect');
+            
+            if (!formContainer || !roadSelect) return;
+
+            formContainer.innerHTML = '<h4 class="text-xs text-slate-400 uppercase font-semibold mb-1">Enter Match Scores</h4>';
+            roadSelect.innerHTML = '<option value="">Nobody / Tie</option>';
+
+            data.forEach(player => {
+                formContainer.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-900/50 p-2 rounded border border-slate-700/50">
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" data-id="${player.id}" class="match-player-check rounded text-amber-500 focus:ring-0 bg-slate-800 border-slate-600">
+                            ${player.name}
+                        </label>
+                        <input type="number" data-id="${player.id}" min="0" max="15" placeholder="0" class="match-player-score bg-slate-900 border border-slate-700 rounded px-2 py-1 w-16 text-center text-sm focus:outline-none focus:border-amber-500">
+                    </div>
+                `;
+                roadSelect.innerHTML += `<option value="${player.id}">${player.name}</option>`;
+            });
+        }
+
+        // 2. Add New Player
+        async function addPlayer() {
+            const nameInput = document.getElementById('newPlayerName');
+            const name = nameInput.value.trim();
+            if (!name) return alert('Please enter a name.');
+
+            const { error } = await db.from('players').insert([{ name }]);
+            if (error) {
+                alert('Error adding player or player already exists.');
+            } else {
+                nameInput.value = '';
+                await loadDashboard();
+            }
+        }
+
+        // 3. Submit Match Results
+        async function submitMatch() {
+            const checkedBoxes = document.querySelectorAll('.match-player-check:checked');
+            const longestRoadPlayerId = document.getElementById('longestRoadSelect').value || null;
+
+            if (checkedBoxes.length < 2) return alert('A match must have at least 2 players.');
+
+            // A: Insert into Matches Table
+            const { data: matchData, error: matchError } = await db
+                .from('matches')
+                .insert([{ longest_road_player_id: longestRoadPlayerId }])
+                .select();
+
+            if (matchError) return alert('Failed to create match record.');
+            const matchId = matchData[0].id;
+
+            // B: Prepare scores array
+            const scoreRecords = [];
+            checkedBoxes.forEach(cb => {
+                const playerId = cb.getAttribute('data-id');
+                const scoreInput = document.querySelector(`.match-player-score[data-id="${playerId}"]`);
+                const score = parseInt(scoreInput.value) || 0;
+                
+                scoreRecords.push({
+                    match_id: matchId,
+                    player_id: playerId,
+                    points_scored: score
+                });
+            });
+
+            // C: Bulk insert match scores
+            const { error: scoreError } = await db.from('match_scores').insert(scoreRecords);
+            if (scoreError) {
+                alert('Error recording match scores.');
+            } else {
+                alert('Match recorded successfully! 🎲');
+                document.querySelectorAll('.match-player-check').forEach(c => c.checked = false);
+                document.querySelectorAll('.match-player-score').forEach(i => i.value = '');
+                document.getElementById('longestRoadSelect').value = '';
+                await loadDashboard();
+            }
+        }
+
+        // 4. Pull Stats & Build Leaderboards
+        async function renderLeaderboards() {
+            const { data: scores, error: scoresErr } = await db.from('match_scores').select('player_id, points_scored');
+            const { data: matches, error: matchesErr } = await db.from('matches').select('longest_road_player_id');
+            
+            if (scoresErr || matchesErr) return;
+
+            const stats = {};
+            globalPlayers.forEach(p => {
+                stats[p.id] = { name: p.name, wins: 0, totalPoints: 0, longestRoads: 0 };
+            });
+
+            scores.forEach(s => {
+                if (stats[s.player_id]) {
+                    stats[s.player_id].totalPoints += s.points_scored;
+                    if (s.points_scored >= 10) {
+                        stats[s.player_id].wins += 1;
+                    }
+                }
+            });
+
+            matches.forEach(m => {
+                if (m.longest_road_player_id && stats[m.longest_road_player_id]) {
+                    stats[m.longest_road_player_id].longestRoads += 1;
+                }
+            });
+
+            const statsArray = Object.values(stats);
+
+            // Render Wins Leaderboard
+            const winsSorted = [...statsArray].sort((a, b) => b.wins - a.wins);
+            const winsBody = document.getElementById('winsLeaderboardBody');
+            if (winsBody) {
+                winsBody.innerHTML = '';
+                winsSorted.forEach((p, index) => {
+                    winsBody.innerHTML += `
+                        <tr class="text-sm">
+                            <td class="py-3 font-bold text-slate-400">#${index + 1}</td>
+                            <td class="py-3 font-semibold text-slate-200">${p.name}</td>
+                            <td class="py-3 text-right font-bold text-emerald-400">${p.wins}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Render Points & Road Leaderboard
+            const pointsSorted = [...statsArray].sort((a, b) => b.totalPoints - a.totalPoints);
+            const pointsBody = document.getElementById('pointsLeaderboardBody');
+            if (pointsBody) {
+                pointsBody.innerHTML = '';
+                pointsSorted.forEach(p => {
+                    pointsBody.innerHTML += `
+                        <tr class="text-sm">
+                            <td class="py-3 font-semibold text-slate-200">${p.name}</td>
+                            <td class="py-3 text-right font-bold text-amber-400">${p.totalPoints} pts</td>
+                            <td class="py-3 text-right font-bold text-blue-400">🪵 ${p.longestRoads}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        // Initialize dashboard
+        loadDashboard();
+    </script>
+         
