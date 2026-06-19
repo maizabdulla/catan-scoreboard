@@ -2,190 +2,192 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catan Group Scoreboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Catan Scoreboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-amber-500/30">
 
-    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl md:text-2xl font-bold tracking-tight text-amber-500 flex items-center gap-2">
-                ⛵️ Catan Scoreboard
+    <header class="border-b border-slate-900 bg-slate-900/70 backdrop-blur-md sticky top-0 z-50 Safe-top">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-lg md:text-2xl font-black tracking-tight text-amber-500 flex items-center gap-1.5 select-none">
+                ⛵️ <span class="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Catan Scoreboard</span>
             </h1>
-            <div class="flex gap-2">
-                <button id="adminBtn" onclick="toggleAdminPanelVisibility()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-700 transition duration-200 cursor-pointer shadow-sm">
+            <div class="flex gap-1.5">
+                <button id="adminBtn" onclick="toggleAdminPanelVisibility()" class="bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-bold px-3 py-2 rounded-xl border border-slate-800 transition active:scale-95 cursor-pointer shadow-sm">
                     Admin Panel
                 </button>
-                <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-950/40 hover:bg-rose-900 text-rose-400 text-sm font-semibold px-4 py-2 rounded-lg border border-rose-900/50 transition duration-200 cursor-pointer shadow-sm">
+                <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-950/40 hover:bg-rose-900 text-rose-400 text-xs font-bold px-3 py-2 rounded-xl border border-rose-900/50 transition active:scale-95 cursor-pointer shadow-sm">
                     Log Out
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-8">
+    <main class="max-w-6xl mx-auto px-3 py-4 md:py-8 space-y-6">
         
-        <div id="adminContainer" class="hidden mb-10 p-6 bg-slate-900 rounded-xl border border-amber-500/30 shadow-xl shadow-amber-500/5 transition-all">
+        <div id="adminContainer" class="hidden p-4 md:p-6 bg-slate-900 rounded-2xl border border-amber-500/20 shadow-xl shadow-amber-500/5 transition-all">
             
-            <div id="loginFormBlock" class="max-w-sm mx-auto py-4">
-                <h2 class="text-lg font-bold text-amber-400 mb-4 text-center">🔐 Admin Authentication</h2>
+            <div id="loginFormBlock" class="max-w-sm mx-auto py-2">
+                <h2 class="text-md font-bold text-amber-400 mb-4 text-center tracking-wide uppercase">🔐 Admin Access</h2>
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Username</label>
-                        <input type="text" id="adminUsername" placeholder="admin" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Username</label>
+                        <input type="text" id="adminUsername" placeholder="admin" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Password</label>
-                        <input type="password" id="adminPassword" placeholder="••••••••" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Password</label>
+                        <input type="password" id="adminPassword" placeholder="••••••••" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
                     </div>
-                    <button onclick="handleLogin()" class="w-full mt-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded-lg text-sm transition cursor-pointer">
+                    <button onclick="handleLogin()" class="w-full mt-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition active:scale-[0.98] cursor-pointer">
                         Sign In
                     </button>
                 </div>
             </div>
 
-            <div id="adminDashboardBlock" class="hidden">
-                <h2 class="text-lg font-bold text-amber-400 mb-6 flex items-center gap-2 border-b border-slate-800 pb-2">
-                    🛠️ Admin Control Dashboard
+            <div id="adminDashboardBlock" class="hidden space-y-5">
+                <h2 class="text-md font-bold text-amber-400 flex items-center gap-2 border-b border-slate-800 pb-2 uppercase tracking-wider">
+                    🛠️ Controls
                 </h2>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800">
-                        <h3 class="font-semibold text-slate-200 mb-3 text-sm tracking-wide uppercase text-amber-500/80">Manage Players</h3>
-                        <div class="space-y-3 mb-4 border-b border-slate-800 pb-4">
-                            <input type="text" id="newPlayerName" placeholder="Name (e.g. Maiz)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800/60">
+                        <h3 class="font-bold text-xs text-slate-400 mb-3 tracking-wider uppercase text-amber-500/80">Manage Players</h3>
+                        <div class="space-y-2.5 mb-4 border-b border-slate-800/80 pb-4">
+                            <input type="text" id="newPlayerName" placeholder="Name (e.g. Maiz)" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm w-full focus:outline-none focus:border-amber-500 text-slate-100">
                             
-                            <div class="flex gap-2">
-                                <div class="w-1/2">
-                                    <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Emoji Profile</label>
-                                    <input type="text" id="newPlayerEmoji" placeholder="🦊" value="🎲" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm w-full text-center focus:outline-none focus:border-amber-500 text-slate-100">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1">Emoji Profile</label>
+                                    <input type="text" id="newPlayerEmoji" placeholder="🦊" value="🎲" class="bg-slate-900 border border-slate-800 rounded-xl px-2 py-2 text-sm w-full text-center focus:outline-none focus:border-amber-500 text-slate-100">
                                 </div>
-                                <div class="w-1/2">
-                                    <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Theme Color</label>
-                                    <div class="flex gap-1 items-center bg-slate-900 border border-slate-700 rounded-lg px-2 py-1">
-                                        <input type="color" id="newPlayerColor" value="#f59e0b" class="bg-transparent border-0 w-8 h-7 p-0 cursor-pointer">
-                                        <span class="text-xs font-mono text-slate-400">Pick</span>
+                                <div>
+                                    <label class="block text-[9px] uppercase tracking-wider text-slate-500 font-bold mb-1">Theme Color</label>
+                                    <div class="flex gap-1.5 items-center bg-slate-900 border border-slate-800 rounded-xl px-2 py-1.5 h-[38px]">
+                                        <input type="color" id="newPlayerColor" value="#f59e0b" class="bg-transparent border-0 w-8 h-6 p-0 cursor-pointer">
+                                        <span class="text-xs font-semibold text-slate-400">Pick</span>
                                     </div>
                                 </div>
                             </div>
                             
-                            <button onclick="addPlayer()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-1.5 rounded-lg text-sm transition cursor-pointer">Add Player</button>
+                            <button onclick="addPlayer()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded-xl text-xs transition active:scale-[0.98] cursor-pointer">Add Player</button>
                         </div>
-                        <div id="adminPlayersList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        <div id="adminPlayersList" class="space-y-1.5 max-h-40 overflow-y-auto pr-1">
                             </div>
                     </div>
 
-                    <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800 lg:col-span-2">
-                        <h3 class="font-semibold text-slate-200 mb-3 text-sm tracking-wide uppercase text-amber-500/80">Log a New Match</h3>
-                        <div id="matchFormPlayers" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                    <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800/60 lg:col-span-2">
+                        <h3 class="font-bold text-xs text-slate-400 mb-3 tracking-wider uppercase text-amber-500/80">Log a New Match</h3>
+                        <div id="matchFormPlayers" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 max-h-48 overflow-y-auto pr-1">
                             </div>
                         
-                        <div class="border-t border-slate-800 pt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
-                            <div class="w-full sm:w-auto">
-                                <label class="block text-xs text-slate-400 uppercase font-semibold mb-1">Longest Road</label>
-                                <select id="longestRoadSelect" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 w-full sm:w-48 focus:outline-none focus:border-amber-500">
+                        <div class="border-t border-slate-800/80 pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-between">
+                            <div class="flex-1">
+                                <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Longest Road</label>
+                                <select id="longestRoadSelect" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 w-full focus:outline-none focus:border-amber-500 h-[38px]">
                                     </select>
                             </div>
-                            <button onclick="submitMatch()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-6 py-2 rounded-lg text-sm shadow-md transition cursor-pointer self-end">
-                                Submit Match Results 🎲
+                            <button onclick="submitMatch()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs shadow-md transition active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1 h-[38px] sm:self-end">
+                                Submit Results 🎲
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div id="pointsEditorBlock" class="hidden mt-6 p-4 bg-slate-950/80 rounded-xl border border-blue-500/30">
-                    <h3 class="font-bold text-blue-400 mb-3 text-sm tracking-wide uppercase flex justify-between items-center">
-                        <span>✏️ Edit Points For Match</span>
-                        <button onclick="closeEditor()" class="text-xs text-slate-500 hover:text-slate-300">Close ✕</button>
+                <div id="pointsEditorBlock" class="hidden p-4 bg-slate-950 rounded-xl border border-blue-500/30">
+                    <h3 class="font-bold text-blue-400 mb-3 text-xs tracking-wider uppercase flex justify-between items-center">
+                        <span>✏️ Edit Match Scores</span>
+                        <button onclick="closeEditor()" class="text-xs text-slate-500 hover:text-slate-300 px-2 py-1">Close ✕</button>
                     </h3>
                     <input type="hidden" id="editMatchId">
-                    <div id="editMatchPlayersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+                    <div id="editMatchPlayersContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
                         </div>
-                    <div class="flex gap-2 items-center justify-between border-t border-slate-800 pt-3">
-                        <div>
-                            <label class="text-xs text-slate-400 uppercase font-semibold mr-2">Adjust Longest Road:</label>
-                            <select id="editLongestRoadSelect" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none">
+                    <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between border-t border-slate-800/80 pt-3">
+                        <div class="flex-1">
+                            <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Adjust Longest Road:</label>
+                            <select id="editLongestRoadSelect" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none w-full sm:w-48 h-[34px]">
                                 </select>
                         </div>
-                        <button onclick="saveMatchEdits()" class="bg-blue-500 hover:bg-blue-600 text-slate-950 font-bold px-4 py-1.5 rounded-lg text-xs shadow transition cursor-pointer">
+                        <button onclick="saveMatchEdits()" class="bg-blue-500 hover:bg-blue-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition active:scale-[0.98] cursor-pointer text-center">
                             Update Match Record
                         </button>
                     </div>
                 </div>
 
-                <div class="mt-6 border-t border-slate-800 pt-4">
-                    <h3 class="font-semibold text-slate-200 mb-3 text-sm tracking-wide uppercase text-amber-500/80">Recent Matches History</h3>
-                    <div class="overflow-x-auto bg-slate-950/40 rounded-lg border border-slate-800 max-h-48 overflow-y-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="text-xs font-semibold text-slate-400 border-b border-slate-800 bg-slate-900/50">
-                                    <th class="p-3">Match ID</th>
-                                    <th class="p-3">Longest Road Holder</th>
-                                    <th class="p-3 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminMatchesList">
-                                </tbody>
-                        </table>
+                <div class="border-t border-slate-800/80 pt-3">
+                    <h3 class="font-bold text-xs text-slate-400 mb-2 tracking-wider uppercase text-amber-500/80">Recent Match Logs</h3>
+                    <div class="overflow-hidden rounded-xl border border-slate-800/60 bg-slate-950/20">
+                        <div class="max-h-40 overflow-y-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-[10px] font-bold text-slate-400 border-b border-slate-800 bg-slate-900/30 tracking-wider uppercase sticky top-0 backdrop-blur-sm">
+                                        <th class="p-2.5 pl-3">Date Played</th>
+                                        <th class="p-2.5">Longest Road</th>
+                                        <th class="p-2.5 text-right pr-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminMatchesList" class="divide-y divide-slate-900/40">
+                                    </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             
-            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden">
-                <div class="p-5 border-b border-slate-800/80 bg-slate-900/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <h2 class="text-base font-bold text-slate-200 tracking-tight flex items-center gap-2">
-                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm">🏆</span>
+            <div class="bg-slate-900/20 border border-slate-900 rounded-2xl shadow-xl backdrop-blur-md overflow-hidden">
+                <div class="p-4 border-b border-slate-900 bg-slate-900/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5">
+                    <h2 class="text-sm font-bold text-slate-200 tracking-tight flex items-center gap-2">
+                        <span class="flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs">🏆</span>
                         Wins Leaderboard
                     </h2>
                     
-                    <div class="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-lg p-1">
-                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider pl-2">Sort:</span>
-                        <select id="winSortOption" onchange="renderLeaderboards()" class="bg-transparent text-xs text-amber-400 font-semibold focus:outline-none pr-2 cursor-pointer">
+                    <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-850 rounded-xl p-1 w-full sm:w-auto justify-between sm:justify-start">
+                        <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider pl-1.5">Sort by:</span>
+                        <select id="winSortOption" onchange="renderLeaderboards()" class="bg-transparent text-xs text-amber-400 font-bold focus:outline-none pr-2 cursor-pointer py-0.5">
                             <option value="pureWins">Most Total Wins</option>
                             <option value="winsByMP">Most Wins / Least Games Played</option>
                             <option value="winRate">Win Rate % (Efficiency)</option>
                         </select>
                     </div>
                 </div>
-                <div class="p-2">
+                <div class="p-1">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800/60">
-                                <th class="p-4 w-16 text-center">Rank</th>
-                                <th class="p-4">Player</th>
-                                <th class="p-4 text-right">Record (W | MP)</th>
+                            <tr class="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-900/40">
+                                <th class="p-3 w-12 text-center">Rank</th>
+                                <th class="p-3">Player</th>
+                                <th class="p-3 text-right pr-4">Record</th>
                             </tr>
                         </thead>
-                        <tbody id="winsLeaderboardBody" class="divide-y divide-slate-800/40">
+                        <tbody id="winsLeaderboardBody" class="divide-y divide-slate-900/30">
                             </tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl shadow-2xl backdrop-blur-md overflow-hidden">
-                <div class="p-5 border-b border-slate-800/80 bg-slate-900/20">
-                    <h2 class="text-base font-bold text-slate-200 tracking-tight flex items-center gap-2">
-                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 text-sm">📊</span>
+            <div class="bg-slate-900/20 border border-slate-900 rounded-2xl shadow-xl backdrop-blur-md overflow-hidden">
+                <div class="p-4 border-b border-slate-900 bg-slate-900/30">
+                    <h2 class="text-sm font-bold text-slate-200 tracking-tight flex items-center gap-2">
+                        <span class="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 text-xs">📊</span>
                         Cumulative Statistics
                     </h2>
                 </div>
-                <div class="p-2">
+                <div class="p-1">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800/60">
-                                <th class="p-4">Player</th>
-                                <th class="p-4 text-right">Matches Played</th>
-                                <th class="p-4 text-right">Total Points</th>
-                                <th class="p-4 text-right w-36">Longest Road</th>
+                            <tr class="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-900/40">
+                                <th class="p-3 pl-4">Player</th>
+                                <th class="p-3 text-center w-14">MP</th>
+                                <th class="p-3 text-center w-16">Points</th>
+                                <th class="p-3 text-right pr-4 w-20">🪵 Road</th>
                             </tr>
                         </thead>
-                        <tbody id="pointsLeaderboardBody" class="divide-y divide-slate-800/40">
+                        <tbody id="pointsLeaderboardBody" class="divide-y divide-slate-900/30">
                             </tbody>
                     </table>
                 </div>
@@ -206,6 +208,9 @@
             const container = document.getElementById('adminContainer');
             container.classList.toggle('hidden');
             updateAdminUIViewState();
+            if(!container.classList.contains('hidden')){
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         function handleLogin() {
@@ -273,23 +278,23 @@
                 const pColor = player.avatar_color || '#f59e0b';
 
                 formContainer.innerHTML += `
-                    <div class="flex items-center justify-between bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer select-none">
-                            <input type="checkbox" data-id="${player.id}" class="match-player-check rounded text-amber-500 focus:ring-0 bg-slate-800 border-slate-700">
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-md text-xs" style="background-color: ${pColor}20; color: ${pColor}; border: 1px solid ${pColor}40">${pEmoji}</span>
-                            ${player.name}
+                    <div class="flex items-center justify-between bg-slate-900/40 p-2.5 rounded-xl border border-slate-800/80 active:bg-slate-900/80 transition">
+                        <label class="flex items-center gap-2.5 text-sm font-medium text-slate-300 cursor-pointer select-none flex-1">
+                            <input type="checkbox" data-id="${player.id}" class="match-player-check w-4 h-4 rounded text-amber-500 focus:ring-0 bg-slate-950 border-slate-800">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-md text-xs font-bold" style="background-color: ${pColor}15; color: ${pColor}; border: 1px solid ${pColor}30">${pEmoji}</span>
+                            <span>${player.name}</span>
                         </label>
-                        <input type="number" data-id="${player.id}" min="0" max="15" placeholder="0" class="match-player-score bg-slate-950 border border-slate-700 rounded px-2 py-1 w-16 text-center text-sm focus:outline-none focus:border-amber-500 text-slate-100">
+                        <input type="number" data-id="${player.id}" inputmode="numeric" min="0" max="15" placeholder="0" class="match-player-score bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 w-14 h-8 text-center text-sm focus:outline-none focus:border-amber-500 text-slate-100 font-mono font-bold">
                     </div>
                 `;
                 roadSelect.innerHTML += `<option value="${player.id}">${player.name}</option>`;
                 adminPlayersList.innerHTML += `
-                    <div class="flex items-center justify-between bg-slate-900/40 px-3 py-1.5 rounded-md border border-slate-800/60 text-sm text-slate-300">
+                    <div class="flex items-center justify-between bg-slate-900/20 px-3 py-2 rounded-xl border border-slate-900 text-sm text-slate-300">
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded" style="background-color: ${pColor}20; color: ${pColor}">${pEmoji}</span>
-                            <span>${player.name}</span>
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded" style="background-color: ${pColor}15; color: ${pColor}">${pEmoji}</span>
+                            <span class="font-medium">${player.name}</span>
                         </div>
-                        <button onclick="deletePlayer('${player.id}', '${player.name}')" class="text-xs text-rose-400 hover:text-rose-600 transition cursor-pointer font-medium font-mono px-1">✕ Delete</button>
+                        <button onclick="deletePlayer('${player.id}', '${player.name}')" class="text-xs text-rose-400 hover:text-rose-500 transition font-bold px-2 py-1 rounded-lg active:bg-rose-500/10">✕</button>
                     </div>
                 `;
             });
@@ -304,25 +309,30 @@
 
             adminMatchesList.innerHTML = '';
             if (matches.length === 0) {
-                adminMatchesList.innerHTML = `<tr><td colspan="3" class="p-3 text-sm text-slate-500 text-center">No matches recorded yet.</td></tr>`;
+                adminMatchesList.innerHTML = `<tr><td colspan="3" class="p-4 text-xs text-slate-500 text-center">No matches recorded yet.</td></tr>`;
                 return;
             }
 
             matches.forEach(m => {
                 const roadHolder = globalPlayers.find(p => p.id == m.longest_road_player_id);
-                const roadName = roadHolder ? roadHolder.name : "None / Tie";
-                const shortId = m.id.substring(0, 8);
+                const roadName = roadHolder ? roadHolder.name : "None";
+                
+                const matchDate = new Date(m.created_at);
+                const formattedDate = matchDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                }) + `, ${matchDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
                 
                 adminMatchesList.innerHTML += `
-                    <tr class="text-sm border-b border-slate-800/40 hover:bg-slate-900/20">
-                        <td class="p-3 text-slate-400 font-mono text-xs">ID: ${shortId}...</td>
-                        <td class="p-3 text-slate-200">${roadName}</td>
-                        <td class="p-3 text-right space-x-1">
-                            <button onclick="openPointsEditor('${m.id}', '${m.longest_road_player_id || ''}')" class="text-xs bg-blue-950/40 hover:bg-blue-900 text-blue-400 px-2.5 py-1 rounded border border-blue-900/50 transition cursor-pointer">
-                                Edit Points
+                    <tr class="text-xs hover:bg-slate-900/30">
+                        <td class="p-2.5 pl-3 text-slate-400 font-mono font-medium">${formattedDate}</td>
+                        <td class="p-2.5 text-slate-300 font-semibold">${roadName}</td>
+                        <td class="p-2.5 text-right pr-3 space-x-1 whitespace-nowrap">
+                            <button onclick="openPointsEditor('${m.id}', '${m.longest_road_player_id || ''}')" class="bg-blue-950/40 active:bg-blue-900/60 text-blue-400 px-2.5 py-1 rounded-lg border border-blue-900/40 transition font-bold text-[10px]">
+                                Edit
                             </button>
-                            <button onclick="deleteMatch('${m.id}')" class="text-xs bg-rose-950/40 hover:bg-rose-900 text-rose-400 px-2.5 py-1 rounded border border-rose-900/50 transition cursor-pointer">
-                                Delete
+                            <button onclick="deleteMatch('${m.id}')" class="bg-rose-950/40 active:bg-rose-900/60 text-rose-400 px-2.5 py-1 rounded-lg border border-rose-900/40 transition font-bold text-[10px]">
+                                Drop
                             </button>
                         </td>
                     </tr>
@@ -337,13 +347,12 @@
             
             document.getElementById('editMatchId').value = matchId;
             editorBlock.classList.remove('hidden');
-            playersContainer.innerHTML = '<span class="text-xs text-slate-500">Loading scores...</span>';
+            editorBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            playersContainer.innerHTML = '<span class="text-xs text-slate-500 p-2 block">Syncing...</span>';
 
-            // Fetch scores logged specifically for this match
             const { data: scores, error } = await db.from('match_scores').select('*').eq('match_id', matchId);
-            if (error || !scores) return alert('Failed to query match details.');
+            if (error || !scores) return alert('Failed to sync details.');
 
-            // Build structural selectors
             roadSelect.innerHTML = '<option value="">Nobody / Tie</option>';
             globalPlayers.forEach(p => {
                 const selectedAttr = p.id == currentRoadPlayerId ? 'selected' : '';
@@ -356,9 +365,9 @@
                 const playerName = playerMeta ? playerMeta.name : 'Unknown';
                 
                 playersContainer.innerHTML += `
-                    <div class="bg-slate-900 p-2 rounded border border-slate-800 flex justify-between items-center">
-                        <span class="text-xs font-semibold text-slate-300">${playerName}</span>
-                        <input type="number" data-score-id="${s.id}" value="${s.points_scored}" min="0" max="15" class="edit-player-score bg-slate-950 border border-slate-700 rounded px-2 py-0.5 w-14 text-center text-xs focus:outline-none focus:border-blue-500 text-slate-100">
+                    <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 flex flex-col gap-1 items-center justify-center">
+                        <span class="text-[10px] font-bold text-slate-400 truncate w-full text-center">${playerName}</span>
+                        <input type="number" inputmode="numeric" data-score-id="${s.id}" value="${s.points_scored}" min="0" max="15" class="edit-player-score bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 w-14 h-8 text-center text-sm font-mono font-bold focus:outline-none focus:border-blue-500 text-slate-100">
                     </div>
                 `;
             });
@@ -373,20 +382,18 @@
             const updatedLongestRoadId = document.getElementById('editLongestRoadSelect').value || null;
             const inputFields = document.querySelectorAll('.edit-player-score');
 
-            // 1. Update individual scores inside match_scores table
             for (let input of inputFields) {
                 const rowId = input.getAttribute('data-score-id');
                 const nextScore = parseInt(input.value) || 0;
                 
                 const { error: updateScoreErr } = await db.from('match_scores').update({ points_scored: nextScore }).eq('id', rowId);
-                if (updateScoreErr) return alert('Error modifying player subscore records.');
+                if (updateScoreErr) return alert('Error sync score data.');
             }
 
-            // 2. Adjust core match metadata structure (longest road status)
             const { error: updateMatchErr } = await db.from('matches').update({ longest_road_player_id: updatedLongestRoadId }).eq('id', matchId);
-            if (updateMatchErr) return alert('Error matching core properties.');
+            if (updateMatchErr) return alert('Error sync match props.');
 
-            alert('Match information synchronized successfully!');
+            alert('Match synchronized!');
             closeEditor();
             await loadDashboard();
         }
@@ -421,9 +428,9 @@
         }
 
         async function deleteMatch(matchId) {
-            if (!confirm("Are you sure you want to delete this match record?")) return;
+            if (!confirm("Delete this match record permanently?")) return;
             const { error } = await db.from('matches').delete().eq('id', matchId);
-            if (error) alert('Failed to drop match.');
+            if (error) alert('Failed to drop.');
             else {
                 closeEditor();
                 await loadDashboard();
@@ -434,10 +441,10 @@
             const checkedBoxes = document.querySelectorAll('.match-player-check:checked');
             const longestRoadPlayerId = document.getElementById('longestRoadSelect').value || null;
 
-            if (checkedBoxes.length < 2) return alert('A match must have at least 2 players.');
+            if (checkedBoxes.length < 2) return alert('Select at least 2 players.');
 
             const { data: matchData, error: matchError } = await db.from('matches').insert([{ longest_road_player_id: longestRoadPlayerId }]).select();
-            if (matchError) return alert('Failed to create match record.');
+            if (matchError) return alert('Failed to construct log.');
             const matchId = matchData[0].id;
 
             const scoreRecords = [];
@@ -455,9 +462,9 @@
 
             const { error: scoreError } = await db.from('match_scores').insert(scoreRecords);
             if (scoreError) {
-                alert('Error recording match scores.');
+                alert('Error writing records.');
             } else {
-                alert('Match recorded successfully! 🎲');
+                alert('Match logged! 🎲');
                 document.querySelectorAll('.match-player-check').forEach(c => c.checked = false);
                 document.querySelectorAll('.match-player-score').forEach(i => i.value = '');
                 document.getElementById('longestRoadSelect').value = '';
@@ -511,8 +518,6 @@
             });
 
             const statsArray = Object.values(stats);
-
-            // Determine sorting technique based on configuration options
             const sortSelection = document.getElementById('winSortOption')?.value || 'pureWins';
             
             const winsSorted = [...statsArray].sort((a, b) => {
@@ -522,11 +527,10 @@
                     return rateB - rateA || b.wins - a.wins;
                 }
                 if (sortSelection === 'winsByMP') {
-                    // Primary sort: Most Wins. Secondary sort: Least Games Played.
                     if (b.wins !== a.wins) return b.wins - a.wins;
                     return a.matchesPlayed - b.matchesPlayed;
                 }
-                return b.wins - a.wins; // Default: Pure raw wins
+                return b.wins - a.wins;
             });
 
             // Render Wins Leaderboard Rows
@@ -534,31 +538,31 @@
             if (winsBody) {
                 winsBody.innerHTML = '';
                 winsSorted.forEach((p, index) => {
-                    let rankBadge = `<span class="font-mono text-slate-500 font-bold">#${index + 1}</span>`;
-                    if (index === 0 && p.wins > 0) rankBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30">🥇</span>`;
-                    if (index === 1 && p.wins > 0) rankBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-400/20 text-slate-300 text-xs font-bold border border-slate-400/30">🥈</span>`;
+                    let rankBadge = `<span class="font-mono text-slate-500 font-bold text-xs">#${index + 1}</span>`;
+                    if (index === 0 && p.wins > 0) rankBadge = `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold border border-amber-500/20">🥇</span>`;
+                    if (index === 1 && p.wins > 0) rankBadge = `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-400/20 text-slate-300 text-[10px] font-bold border border-slate-400/20">🥈</span>`;
                     
                     const calculatedWinRate = p.matchesPlayed > 0 ? Math.round((p.wins / p.matchesPlayed) * 100) : 0;
                     
                     let displayRateString = '';
-                    if (sortSelection === 'winRate') displayRateString = `<span class="text-[10px] block text-emerald-500/80 font-normal">${calculatedWinRate}% Win Rate</span>`;
-                    if (sortSelection === 'winsByMP') displayRateString = `<span class="text-[10px] block text-amber-500/60 font-normal">Tiebreaker efficiency</span>`;
+                    if (sortSelection === 'winRate') displayRateString = `<span class="text-[9px] block text-emerald-400/80 font-medium">${calculatedWinRate}% Win Rate</span>`;
+                    if (sortSelection === 'winsByMP') displayRateString = `<span class="text-[9px] block text-amber-500/60 font-medium">Efficiency Tiebreaker</span>`;
 
                     winsBody.innerHTML += `
-                        <tr class="group hover:bg-slate-900/30 transition duration-150">
-                            <td class="p-4 text-center font-medium">${rankBadge}</td>
-                            <td class="p-4 font-semibold text-slate-200 group-hover:text-amber-400 transition flex items-center gap-3">
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl text-sm" style="background-color: ${p.color}15; color: ${p.color}; border: 1px solid ${p.color}30">
+                        <tr class="group active:bg-slate-900/20 transition duration-75">
+                            <td class="p-3 text-center font-medium">${rankBadge}</td>
+                            <td class="p-3 font-bold text-slate-200 group-hover:text-amber-400 flex items-center gap-2.5">
+                                <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs" style="background-color: ${p.color}10; color: ${p.color}; border: 1px solid ${p.color}20">
                                     ${p.emoji}
                                 </span>
-                                <div>
-                                    <span>${p.name}</span>
+                                <div class="truncate max-w-[120px] sm:max-w-none">
+                                    <span class="text-xs block truncate">${p.name}</span>
                                     ${displayRateString}
                                 </div>
                             </td>
-                            <td class="p-4 text-right">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold font-mono bg-slate-900 border border-slate-800" style="color: ${p.color}; border-color: ${p.color}25;">
-                                    ${p.wins}W <span class="mx-1 text-slate-600">|</span> ${p.matchesPlayed}MP
+                            <td class="p-3 text-right pr-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold font-mono bg-slate-900 border border-slate-850" style="color: ${p.color}; border-color: ${p.color}20;">
+                                    ${p.wins}W <span class="mx-1 text-slate-700">|</span> ${p.matchesPlayed}P
                                 </span>
                             </td>
                         </tr>
@@ -566,25 +570,25 @@
                 });
             }
 
-            // Render Points & Road Leaderboard Rows (Now featuring dynamic Matches Played stats)
+            // Render Cumulative Statistics Rows
             const pointsSorted = [...statsArray].sort((a, b) => b.totalPoints - a.totalPoints);
             const pointsBody = document.getElementById('pointsLeaderboardBody');
             if (pointsBody) {
                 pointsBody.innerHTML = '';
                 pointsSorted.forEach(p => {
                     pointsBody.innerHTML += `
-                        <tr class="group hover:bg-slate-900/30 transition duration-150">
-                            <td class="p-4 font-semibold text-slate-200 group-hover:text-amber-400 transition flex items-center gap-3">
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl text-sm" style="background-color: ${p.color}15; color: ${p.color}; border: 1px solid ${p.color}30">
+                        <tr class="group active:bg-slate-900/20 transition duration-75">
+                            <td class="p-3 pl-4 font-bold text-slate-200 flex items-center gap-2.5">
+                                <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs" style="background-color: ${p.color}10; color: ${p.color}; border: 1px solid ${p.color}20">
                                     ${p.emoji}
                                 </span>
-                                ${p.name}
+                                <span class="text-xs truncate max-w-[100px] sm:max-w-none">${p.name}</span>
                             </td>
-                            <td class="p-4 text-right font-medium text-slate-400 font-mono text-sm">${p.matchesPlayed} <span class="text-xs text-slate-600 font-normal">mp</span></td>
-                            <td class="p-4 text-right font-bold text-amber-500/90 font-mono text-sm">${p.totalPoints} <span class="text-xs text-slate-500 font-normal">pts</span></td>
-                            <td class="p-4 text-right">
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold font-mono ${p.longestRoads > 0 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-slate-800/40 text-slate-500'}">
-                                    🪵 ${p.longestRoads}
+                            <td class="p-3 text-center font-bold text-slate-400 font-mono text-xs">${p.matchesPlayed}</td>
+                            <td class="p-3 text-center font-black text-amber-500/90 font-mono text-xs">${p.totalPoints}</td>
+                            <td class="p-3 text-right pr-4">
+                                <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[10px] font-bold font-mono ${p.longestRoads > 0 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/10' : 'text-slate-600'}">
+                                    ${p.longestRoads}
                                 </span>
                             </td>
                         </tr>
